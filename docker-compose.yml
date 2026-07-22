@@ -3,11 +3,11 @@ services:
     image: redis:7.2
     container_name: redis-master
     hostname: redis-master
-    command: sh -c "cp /etc/redis/redis.conf && redis-server /tmp/redis.conf"
+    command: sh -c "cp /etc/redis/redis.conf /tmp/redis.conf && redis-server /tmp/redis.conf"
     volumes:
       - ./conf/master.conf:/etc/redis/redis.conf:ro
     ports:
-      - "6370:6379"
+      - "6379:6379"
     networks: [redis-net]
 
   redis-replica1:
