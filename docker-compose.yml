@@ -1,0 +1,75 @@
+services:
+  redis-master:
+    image: redis:7.2
+    container_name: redis-master
+    hostname: redis-master
+    command: sh -c "cp /etc/redis/redis.conf && redis-server /tmp/redis.conf"
+    volumes:
+      - ./conf/master.conf:/etc/redis/redis.conf:ro
+    ports:
+      - "6370:6379"
+    networks: [redis-net]
+
+  redis-replica1:
+    image: redis:7.2
+    container_name: redis-replica1
+    hostname: redis-replica1
+    command: sh -c "cp /etc/redis/redis.conf /tmp/redis.conf && redis-server /tmp/redis.conf"
+    volumes:
+      - ./conf/replica.conf:/etc/redis/redis.conf:ro
+    ports:
+      - "6380:6379"
+    depends_on: [redis-master]
+    networks: [redis-net]
+
+  redis-replica2:
+    image: redis:7.2
+    container_name: redis-replica2
+    hostname: redis-replica2
+    command: sh -c "cp /etc/redis/redis.conf /tmp/redis.conf && redis-server /tmp/redis.conf"
+    volumes:
+      - ./conf/replica.conf:/etc/redis/redis.conf:ro
+    ports:
+      - "6381:6379"
+    depends_on: [redis-master]
+    networks: [redis-net]
+
+  sentinel1:
+    image: redis:7.2
+    container_name: sentinel1
+    hostname: sentinel1
+    command: sh -c "cp /etc/redis/sentinel.conf /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./conf/sentinel.conf:/etc/redis/sentinel.conf:ro
+    ports:
+      - "26379:26379"
+    depends_on: [redis-master, redis-replica1, redis-replica2]
+    networks: [redis-net]
+
+  sentinel2:
+    image: redis:7.2
+    container_name: sentinel2
+    hostname: sentinel2
+    command: sh -c "cp /etc/redis/sentinel.conf /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./conf/sentinel.conf:/etc/redis/sentinel.conf:ro
+    ports:
+      - "26380:26379"
+    depends_on: [redis-master, redis-replica1, redis-replica2]
+    networks: [redis-net]
+
+  sentinel3:
+    image: redis:7.2
+    container_name: sentinel3
+    hostname: sentinel3
+    command: sh -c "cp /etc/redis/sentinel.conf /tmp/sentinel.conf && redis-sentinel /tmp/sentinel.conf"
+    volumes:
+      - ./conf/sentinel.conf:/etc/redis/sentinel.conf:ro
+    ports:
+      - "26381:26379"
+    depends_on: [redis-master, redis-replica1, redis-replica2]
+    networks: [redis-net]
+
+networks:
+  redis-net:
+    driver: brdige
